@@ -937,13 +937,7 @@ class SSHModelManager(QMainWindow):
         self.current_download_item = None
         
         if not success and item and item.get("_cancelled"):
-            if item['url'].startswith('local://'):
-                self.ssh.delete_file(item['folder'], item['filename'])
-            else:
-                local_path = os.path.join(self.dl_dir, item['folder'], item['filename'])
-                if os.path.exists(local_path):
-                    try: os.remove(local_path)
-                    except: pass
+            self.ssh.delete_file(item['folder'], item['filename'])
                     
         if item:
             filename = item.get('filename', 'Unknown')
