@@ -6,7 +6,7 @@ A cross-platform desktop application built with Python and PyQt6 designed to man
 
 I wrote this application because I got tired of downloading all my models from scratch every time I rented a remote GPU server. Keeping track of which models to download, finding their links, and executing terminal commands is a constant headache. I built this tool to keep my model library cataloged in one place and sync it with any server instantly.
 
-I hope this application brings you comfort, saves you time, and gets rid of that headache!
+I hope this application brings you comfort, saves you time, and gets rid of that headache.
 
 ## Features
 
@@ -62,7 +62,7 @@ I hope this application brings you comfort, saves you time, and gets rid of that
 
 ### 1. Connection
 
-In the first tab, you can enter your server's SSH credentials. You can also quickly paste a full SSH command (e.g., `ssh root@192.168.1.10 -p 22`) and the fields will auto-fill. The password field can be left empty; you can also specify the path to your SSH key and enter the key passphrase if required. Don't forget to enter your API tokens if you plan to download restricted models!
+In the first tab, you can enter your server's SSH credentials. You can also quickly paste a full SSH command (e.g., `ssh root@192.168.1.10 -p 22`) and the fields will auto-fill. The password field can be left empty; you can also specify the path to your SSH key and enter the key passphrase if required. Don't forget to enter your API tokens if you plan to download restricted models.
 
 ### 2. Downloads
 
