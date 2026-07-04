@@ -381,6 +381,8 @@ class SSHModelManager(QMainWindow):
         self.lbl_folder.setText(self.tr("folder_lbl"))
         self.btn_add_queue.setText(self.tr("btn_add_queue"))
         self.lbl_queue_title.setText(self.tr("lbl_queue"))
+        if not self.is_downloading:
+            self.lbl_progress.setText(self.tr("lbl_waiting"))
         
         self.search_entry.setPlaceholderText(self.tr("search_placeholder"))
         self.btn_on_disk.setText(self.tr("btn_on_disk"))
