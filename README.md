@@ -8,12 +8,6 @@ I wrote this application because I got tired of downloading all my models from s
 
 I hope this application brings you comfort, saves you time, and gets rid of that headache!
 
-## Screenshots
-
-![Connection Tab](screenshots/connection.png)
-![Downloads Tab](screenshots/downloads.png)
-![Library Tab](screenshots/library.png)
-
 ## Features
 
 - **🚀 SFTP Uploads (Drag & Drop):** Simply drag and drop any model file from your computer directly into the application window to upload it to your remote server via pipelined SFTP.
@@ -25,6 +19,12 @@ I hope this application brings you comfort, saves you time, and gets rid of that
 - **🧹 Deletion:** Delete files from the remote server to free up space while keeping the model cataloged in your library for future downloads.
 - **📥 Library Cataloging:** Add model files already present on the server to your library (with custom download URLs) for quick future downloads.
 - **🌍 Multilingual UI:** Support for 3 languages (English, Russian, Chinese).
+
+## Screenshots
+
+![Connection Tab](screenshots/connection.png)
+![Downloads Tab](screenshots/downloads.png)
+![Library Tab](screenshots/library.png)
 
 ## Prerequisites
 
