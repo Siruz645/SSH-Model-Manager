@@ -566,6 +566,8 @@ class SSHModelManager(QMainWindow):
         api_c = self.config.get("api", {})
         add_row(self.tr("hf_token"), "hf_entry", api_c.get("huggingface", ""))
         add_row(self.tr("civitai_token"), "civitai_entry", api_c.get("civitai", ""))
+        self.hf_entry.textChanged.connect(self.on_api_keys_changed)
+        self.civitai_entry.textChanged.connect(self.on_api_keys_changed)
         layout.addSpacing(20)
         
         bot = QHBoxLayout()
@@ -629,6 +631,13 @@ class SSHModelManager(QMainWindow):
             else:
                 self.signals.connected.emit(False, msg, "", [])
         threading.Thread(target=t, daemon=True).start()
+
+    def on_api_keys_changed(self):
+        if "api" not in self.config:
+            self.config["api"] = {}
+        self.config["api"]["huggingface"] = self.hf_entry.text().strip()
+        self.config["api"]["civitai"] = self.civitai_entry.text().strip()
+        self.db.save_config(self.config)
 
     def on_connected_slot(self, success, msg, space, folders):
         if success:
