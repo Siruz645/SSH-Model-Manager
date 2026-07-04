@@ -2,6 +2,12 @@
 
 A cross-platform desktop application built with Python and PyQt6 designed to manage, download, and upload models for remote ComfyUI servers.
 
+## Why this exists
+
+I wrote this application because I got tired of downloading all my models from scratch every time I rented a remote GPU server. Keeping track of which models to download, finding their links, and executing terminal commands is a constant headache. I built this tool to keep my model library cataloged in one place and sync it with any server instantly.
+
+I hope this application brings you comfort, saves you time, and gets rid of that headache
+
 ## Features
 
 - **🚀 SFTP Uploads (Drag & Drop):** Simply drag and drop any model file from your computer directly into the application window to upload it to your remote server via pipelined SFTP.
@@ -21,18 +27,22 @@ A cross-platform desktop application built with Python and PyQt6 designed to man
 ## Installation & Usage
 
 **For Windows Users (Easiest Method):**
+
 1. Clone the repository or download the ZIP.
 2. Double-click `start.bat`.
-   *(It will automatically create a virtual environment, install the required dependencies, and launch the app).*
+   _(It will automatically create a virtual environment, install the required dependencies, and launch the app)._
 
 **Manual Installation (Linux/Mac/Advanced):**
+
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/yourusername/SSHModelManager.git
    cd SSHModelManager
    ```
 
 2. Install the required dependencies:
+
    ```bash
    pip install -r requirements.txt
    ```
@@ -45,19 +55,24 @@ A cross-platform desktop application built with Python and PyQt6 designed to man
 ## Usage Guide
 
 ### 1. Connection
+
 In the first tab, you can enter your server's SSH credentials. You can also quickly paste a full SSH command (e.g., `ssh root@192.168.1.10 -p 22`) and the fields will auto-fill. The password field can be left empty; you can also specify the path to your SSH key and enter the key passphrase if required. Don't forget to enter your API tokens if you plan to download restricted models!
 
 ### 2. Downloads
+
 Paste URLs here to start remote downloads, or drag and drop files from your desktop to start SFTP uploads. Active tasks can be paused or cancelled at any time.
 
 ### 3. Library
+
 View all downloaded or scanned models on your server.
+
 - Check the boxes next to models and click **Create Package** to group them.
 - Right-click any package to **Export** it to a `.json` file, or delete it.
 - **Drag & Drop** any previously exported `.json` file into the window to instantly import the package and bulk-download all its models.
 - **Mass Queueing:** Select entire packages or individual files and click "Add Selected to Queue" to batch download them.
 
 ## Technologies Used
+
 - **PyQt6**: For the modern, responsive Graphical User Interface.
 - **Paramiko**: For secure SSH connections and pipelined SFTP file transfers.
 - **SQLite**: For lightweight, local caching of your model library.
