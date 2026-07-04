@@ -949,6 +949,16 @@ class SSHModelManager(QMainWindow):
                 self.log_message(f"{filename} - {self.tr('log_dl_success')}", "success")
             elif not success and msg != "Connection closed unexpectedly" and msg != "Upload paused" and not item.get("_cancelled"):
                 self.log_message(f"{filename} - {self.tr('log_dl_error', str(msg))}", "error")
+                
+            # If download/upload failed (not cancelled) and inputs are empty, restore details for editing
+            if not success and not item.get("_cancelled") and msg != "Upload paused":
+                if not self.url_entry.text().strip():
+                    self.url_entry.setText(item.get("url", ""))
+                    self.filename_entry.setText(item.get("filename", ""))
+                    idx = self.folder_combo.findText(item.get("folder", ""))
+                    if idx >= 0:
+                        self.folder_combo.setCurrentIndex(idx)
+                        
         self.process_queue()
         self.populate_library()
 
