@@ -936,8 +936,10 @@ class SSHModelManager(QMainWindow):
         self.is_downloading = False
         self.current_download_item = None
         
-        if not success and item and item.get("_cancelled"):
-            self.ssh.delete_file(item['folder'], item['filename'])
+        if not success and item:
+            # Delete remote file if direct download failed, or if SFTP upload was explicitly cancelled
+            if not item['url'].startswith('local://') or item.get("_cancelled"):
+                self.ssh.delete_file(item['folder'], item['filename'])
                     
         if item:
             filename = item.get('filename', 'Unknown')
