@@ -6,7 +6,13 @@ A cross-platform desktop application built with Python and PyQt6 designed to man
 
 I wrote this application because I got tired of downloading all my models from scratch every time I rented a remote GPU server. Keeping track of which models to download, finding their links, and executing terminal commands is a constant headache. I built this tool to keep my model library cataloged in one place and sync it with any server instantly.
 
-I hope this application brings you comfort, saves you time, and gets rid of that headache
+I hope this application brings you comfort, saves you time, and gets rid of that headache!
+
+## Screenshots
+
+![Connection Tab](screenshots/connection.png)
+![Downloads Tab](screenshots/downloads.png)
+![Library Tab](screenshots/library.png)
 
 ## Features
 
