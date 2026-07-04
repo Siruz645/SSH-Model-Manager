@@ -108,6 +108,7 @@ class WorkerSignals(QObject):
     download_done = pyqtSignal(bool, str)
     library_scanned = pyqtSignal(list)
     free_space_updated = pyqtSignal(str)
+    civitai_meta_fetched = pyqtSignal(str, str, str)
 
 class ModelEditDialog(QDialog):
     def __init__(self, parent, data):
@@ -318,6 +319,7 @@ class SSHModelManager(QMainWindow):
         self.signals.connected.connect(self.on_connected_slot)
         self.signals.download_progress.connect(self.on_download_progress)
         self.signals.download_done.connect(self.on_download_done)
+        self.signals.civitai_meta_fetched.connect(self.update_civitai_ui)
         self.signals.library_scanned.connect(self.on_library_scanned)
         self.signals.free_space_updated.connect(self.on_free_space_updated)
 
@@ -747,6 +749,10 @@ class SSHModelManager(QMainWindow):
     def auto_extract_filename(self, text):
         if not text: return
         try:
+            if "civitai" in text:
+                self.fetch_civitai_metadata(text)
+                return
+                
             if "huggingface.co" in text and "/blob/" in text:
                 text = text.replace("/blob/", "/resolve/")
                 if not text.endswith("?download=true"):
@@ -784,6 +790,115 @@ class SSHModelManager(QMainWindow):
                 self.folder_combo.setStyleSheet("QComboBox { border: 2px solid #e74c3c; } QComboBox QAbstractItemView { min-width: 350px; padding: 4px; }")
                 
         except: pass
+
+    def fetch_civitai_metadata(self, query_url):
+        print(f"[DEBUG] fetch_civitai_metadata started for: {query_url}")
+        def run():
+            try:
+                import urllib.request
+                import json
+                import re
+                
+                # Extract version ID or model ID
+                m_ver = re.search(r"api/download/models/(\d+)", query_url)
+                if not m_ver:
+                    m_ver = re.search(r"modelVersionId=(\d+)", query_url)
+                    
+                api_url = ""
+                is_model_endpoint = False
+                if m_ver:
+                    version_id = m_ver.group(1)
+                    api_url = f"https://civitai.com/api/v1/model-versions/{version_id}"
+                else:
+                    m_id = re.search(r"models/(\d+)", query_url)
+                    if m_id:
+                        model_id = m_id.group(1)
+                        api_url = f"https://civitai.com/api/v1/models/{model_id}"
+                        is_model_endpoint = True
+                        
+                if not api_url:
+                    print("[DEBUG] Failed to resolve Civitai API URL from link")
+                    return
+                    
+                print(f"[DEBUG] Requesting Civitai API: {api_url}")
+                headers = {'User-Agent': 'Mozilla/5.0'}
+                token = self.config.get("api", {}).get("civitai", "")
+                if token:
+                    headers['Authorization'] = f'Bearer {token}'
+                    
+                req = urllib.request.Request(api_url, headers=headers)
+                with urllib.request.urlopen(req) as resp:
+                    data = json.loads(resp.read().decode('utf-8'))
+                    
+                model_type = ""
+                files = []
+                
+                if is_model_endpoint:
+                    model_type = data.get("type", "")
+                    versions = data.get("modelVersions", [])
+                    if versions:
+                        files = versions[0].get("files", [])
+                else:
+                    model_type = data.get("model", {}).get("type", "")
+                    files = data.get("files", [])
+                    
+                filename = ""
+                # Try matching fileId in query
+                parsed_query = urllib.parse.parse_qs(urllib.parse.urlparse(query_url).query)
+                file_id_list = parsed_query.get("fileId", [])
+                target_file_id = int(file_id_list[0]) if file_id_list else None
+                
+                if target_file_id and files:
+                    for f in files:
+                        if f.get("id") == target_file_id:
+                            filename = f.get("name", "")
+                            break
+                            
+                if not filename and files:
+                    # Fallback to primary or first file
+                    for f in files:
+                        if f.get("primary"):
+                            filename = f.get("name", "")
+                            break
+                    if not filename:
+                        filename = files[0].get("name", "")
+                        
+                folder = ""
+                if model_type:
+                    t_lower = model_type.lower()
+                    CIVITAI_TYPE_MAP = {
+                        "checkpoint": "checkpoints",
+                        "lora": "loras",
+                        "locon": "loras",
+                        "vae": "vae",
+                        "controlnet": "controlnet",
+                        "textualinversion": "embeddings",
+                        "hypernetwork": "hypernetworks",
+                        "upscaler": "upscale",
+                        "motionmodule": "unet",
+                        "pose": "embeddings",
+                        "wildcards": "embeddings",
+                    }
+                    folder = CIVITAI_TYPE_MAP.get(t_lower, "")
+                    
+                print(f"[DEBUG] Civitai fetch successful. Filename: {filename}, Folder: {folder}")
+                if filename or folder:
+                    self.signals.civitai_meta_fetched.emit(query_url, filename, folder)
+            except Exception as e:
+                print(f"[DEBUG] Civitai metadata fetch failed: {e}")
+                
+        threading.Thread(target=run, daemon=True).start()
+
+    def update_civitai_ui(self, query_url, filename, folder):
+        print(f"[DEBUG] update_civitai_ui called. UI url: '{self.url_entry.text().strip()}', Query url: '{query_url.strip()}'")
+        if self.url_entry.text().strip() == query_url.strip():
+            print(f"[DEBUG] Match! Setting filename to: {filename}, folder to: {folder}")
+            if filename:
+                self.filename_entry.setText(filename)
+            if folder:
+                self.folder_combo.setCurrentText(folder)
+        else:
+            print("[DEBUG] Mismatch! URL changed.")
         
     def on_folder_changed(self, text):
         self.folder_combo.setStyleSheet("QComboBox QAbstractItemView { min-width: 350px; padding: 4px; }")
@@ -899,7 +1014,7 @@ class SSHModelManager(QMainWindow):
         folder = item['folder']
         
         token = ""
-        if "civitai.com" in url:
+        if "civitai" in url:
             civitai_token = self.config["api"].get("civitai", "")
             if civitai_token:
                 import urllib.parse
